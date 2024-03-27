@@ -1,0 +1,32 @@
+package myexceptions;
+import dao.IPolicyService;
+import dao.InsuranceServiceImpl;
+import entity.Policy;
+import myexceptions.PolicyNotFoundException;
+import util.DBConnection;
+
+public class Main {
+    public static void main(String[] args) {
+        try {
+            IPolicyService policyService = new InsuranceServiceImpl();
+
+            // Example usage: fetching a policy with an invalid policyId
+            int invalidPolicyId = 100; // Assuming there is no policy with ID 100 in the database
+            Policy policy = policyService.getPolicy(invalidPolicyId);
+            if (policy == null) {
+                throw new PolicyNotFoundException("Policy with ID " + invalidPolicyId + " not found.");
+            }
+        } catch (PolicyNotFoundException e) {
+            System.out.println("Policy not found: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Close database connection if required
+            try {
+                DBConnection.getConnection().close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}

@@ -1,0 +1,61 @@
+package mainmod;
+
+import dao.IPolicyService;
+import dao.InsuranceServiceImpl;
+import entity.Policy;
+import myexceptions.PolicyNotFoundException;
+import util.DBConnection;
+
+import java.util.Collection;
+
+public class MainModule {
+    public static void main(String[] args) {
+        try {
+            IPolicyService policyService = new InsuranceServiceImpl();
+
+            // Trigger all methods in service implementation class
+            // 1. Create Policy
+            Policy newPolicy = new Policy(4, "New Policy", "Type A");
+            boolean created = policyService.createPolicy(newPolicy);
+            System.out.println("Policy created: " + created);
+
+            // 2. Get Policy
+            int policyIdToFetch = 1; // Example policy ID to fetch
+            Policy fetchedPolicy = policyService.getPolicy(policyIdToFetch);
+            if (fetchedPolicy != null) {
+                System.out.println("Fetched Policy: " + fetchedPolicy);
+            } else {
+                throw new PolicyNotFoundException("Policy with ID " + policyIdToFetch + " not found.");
+            }
+
+            // 3. Get All Policies
+            Collection<Policy> allPolicies = policyService.getAllPolicies();
+            System.out.println("All Policies:");
+            for (Policy policy : allPolicies) {
+                System.out.println(policy);
+            }
+
+            // 4. Update Policy
+            Policy policyToUpdate = new Policy(2, "Updated Policy", "Type B");
+            boolean updated = policyService.updatePolicy(policyToUpdate);
+            System.out.println("Policy updated: " + updated);
+
+            // 5. Delete Policy
+            int policyIdToDelete = 3; // Example policy ID to delete
+            boolean deleted = policyService.deletePolicy(policyIdToDelete);
+            System.out.println("Policy deleted: " + deleted);
+
+        } catch (PolicyNotFoundException e) {
+            System.out.println("Policy not found: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Close database connection if required
+            try {
+                DBConnection.getConnection().close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
